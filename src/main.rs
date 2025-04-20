@@ -50,6 +50,8 @@ impl fmt::Display for Loader {
     }
 }
 
+const SUPPORTED_LOADERS: &[&str] = &["fabric", "forge", "vanilla"];
+
 #[derive(Debug, Deserialize)]
 enum ProjectType {
     Mod,
@@ -117,19 +119,23 @@ fn new(server: Option<bool>, os: Option<OsString>) -> Result<()> {
         .into_iter()
         .filter(|v| v.version_type == "release" && v.major == true)
         .collect::<Vec<Version>>();
+    let default_version_idx = &versions
+        .iter()
+        .position(|v| v.version == "1.20.1")
+        .unwrap_or(0);
     let version_selection = Select::with_theme(&ColorfulTheme::default())
         .with_prompt("Pick a version")
         .items(&versions)
-        .default(0)
+        .default(*default_version_idx)
         .interact();
-    let loaders_uri = format!("{}{}", MODRINTH_URI, "/v2/tag/loader");
-    let loaders = blocking::get(loaders_uri)?
-        .json::<Vec<Loader>>()?;
-    println!("Loaders: {:#?}", loaders);
+    let default_loader = &SUPPORTED_LOADERS
+        .iter()
+        .position(|l| *l == "fabric")
+        .unwrap_or(0);
     let loader_selection = Select::with_theme(&ColorfulTheme::default())
         .with_prompt("Pick a loader")
-        .items(&loaders)
-        .default(0)
+        .items(SUPPORTED_LOADERS)
+        .default(*default_loader)
         .interact();
     Ok(())
 }
