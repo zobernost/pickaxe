@@ -962,12 +962,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "51d515d32fb182ee37cda2ccdcb92950d6a3c2893aa280e540671c2cd0f3b1d9"
 
 [[package]]
-name = "num-ordinal"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b244f65fa4ff30000abd52b6f916061f852b907cc17de811639c1aa2418eab6"
-
-[[package]]
 name = "num-traits"
 version = "0.2.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -975,6 +969,12 @@ checksum = "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841"
 dependencies = [
  "autocfg",
 ]
+
+[[package]]
+name = "number-names"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8514324ace52befd9127884ed7330fae864eebbeb8ab9402e87087a302d086d7"
 
 [[package]]
 name = "number_prefix"
@@ -1064,7 +1064,7 @@ dependencies = [
  "dialoguer",
  "dirs",
  "indicatif",
- "num-ordinal",
+ "number-names",
  "reqwest",
  "semver",
  "serde",

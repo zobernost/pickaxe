@@ -86,7 +86,7 @@ impl Instance {
     }
 }
 
-pub fn get_instance_count(r#type: InstanceType) -> Result<u32> {
+pub fn get_instance_count(r#type: InstanceType) -> Result<u64> {
     let config_dir = dirs::config_dir().expect("Failed to get config directory");
     let pickaxe_dir = config_dir.join("pickaxe");
     let dir = match r#type {
@@ -94,7 +94,7 @@ pub fn get_instance_count(r#type: InstanceType) -> Result<u32> {
         InstanceType::Server => pickaxe_dir.join("servers"),
     };
     match fs::read_dir(dir.clone()) {
-        Ok(dir) => Ok(dir.count() as u32),
+        Ok(dir) => Ok(dir.count() as u64),
         Err(_) => Ok(0),
     }
 }

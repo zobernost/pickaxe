@@ -9,9 +9,7 @@ use anyhow::Result;
 use capitalize::Capitalize;
 use console::{Term, style};
 use dialoguer::{Input, Select, theme::ColorfulTheme};
-use indicatif::{ProgressBar, ProgressStyle};
-use num_ordinal::{O32, ordinal0};
-use tokio::task::JoinHandle;
+use number_names::ordinal;
 
 pub async fn new(client: bool, mut server: bool) -> Result<()> {
     let term = Term::stdout();
@@ -40,12 +38,16 @@ pub async fn new(client: bool, mut server: bool) -> Result<()> {
         InstanceType::Client
     };
 
-    let instance_number: O32 = match r#type {
-        InstanceType::Server => ordinal0(get_instance_count(InstanceType::Server)?),
-        InstanceType::Client => ordinal0(get_instance_count(InstanceType::Client)?),
+    let instance_number: String = match r#type {
+        InstanceType::Server => ordinal((get_instance_count(InstanceType::Server)?) + 1),
+        InstanceType::Client => ordinal((get_instance_count(InstanceType::Client)?) + 1),
     };
 
-    let default_name = format!("My {} {}", instance_number.to_string().capitalize(), r#type);
+    let default_name = format!(
+        "My {} {} Instance",
+        instance_number.to_string().capitalize(),
+        r#type
+    );
 
     let name: String = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("Instance name")
