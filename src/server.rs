@@ -10,9 +10,8 @@ use std::fs;
 
 #[serde_as]
 #[derive(Debug, Serialize)]
-pub struct Instance {
+pub struct Server {
     name: String,
-    r#type: InstanceType,
     #[serde_as(as = "DisplayFromStr")]
     version: mc::Version,
     #[serde_as(as = "DisplayFromStr")]
@@ -21,32 +20,15 @@ pub struct Instance {
     java_version: java::Version,
 }
 
-#[derive(Debug, Serialize)]
-pub enum InstanceType {
-    Client,
-    Server,
-}
-
-impl std::fmt::Display for InstanceType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            InstanceType::Client => write!(f, "Client"),
-            InstanceType::Server => write!(f, "Server"),
-        }
-    }
-}
-
-impl Instance {
+impl Server {
     pub fn new(
         name: String,
-        r#type: InstanceType,
         version: mc::Version,
         fabric_version: fabric::Version,
         java_version: java::Version,
     ) -> Self {
         Self {
             name,
-            r#type,
             version,
             fabric_version,
             java_version,
@@ -57,12 +39,12 @@ impl Instance {
         let config_dir = dirs::config_dir().expect("Failed to get config directory");
         let pickaxe_dir = config_dir.join("pickaxe");
         let output_dir = pickaxe_dir
-            .join(&format!("{}s", self.r#type.to_string().to_lowercase()))
+            .join("servers")
             .join(&self.name);
         fs::create_dir_all(&output_dir)?;
 
         let output_file_path =
-            output_dir.join(format!("{}.toml", self.r#type.to_string().to_lowercase()));
+            output_dir.join("server.toml");
         let output_file_contents = self.to_toml()?;
         fs::write(&output_file_path, output_file_contents)?;
 
@@ -86,14 +68,11 @@ impl Instance {
     }
 }
 
-pub fn get_instance_count(r#type: InstanceType) -> Result<u64> {
+pub fn get_server_count() -> Result<u64> {
     let config_dir = dirs::config_dir().expect("Failed to get config directory");
     let pickaxe_dir = config_dir.join("pickaxe");
-    let dir = match r#type {
-        InstanceType::Client => pickaxe_dir.join("clients"),
-        InstanceType::Server => pickaxe_dir.join("servers"),
-    };
-    match fs::read_dir(dir.clone()) {
+    let servers_dir = pickaxe_dir.join("servers");
+    match fs::read_dir(servers_dir.clone()) {
         Ok(dir) => Ok(dir.count() as u64),
         Err(_) => Ok(0),
     }

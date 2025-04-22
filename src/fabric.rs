@@ -22,3 +22,6 @@ impl Clone for Version {
         }
     }
 }
+
+//https://meta.fabricmc.net/v2/versions/loader/1.21.5/0.16.14
+//https://maven.fabricmc.net/net/fabricmc/fabric-loader/0.16.4/

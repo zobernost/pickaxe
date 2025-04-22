@@ -10,19 +10,15 @@ pub mod stop;
 #[derive(Debug, Parser)]
 pub enum Commands {
     #[command(
-        about = "Create a new client or server instance",
+        about = "Create a new server",
         alias = "n",
         alias = "i",
         alias = "init"
     )]
     New {
-        #[arg(short, long, conflicts_with = "server")]
-        client: bool,
-        #[arg(short, long, conflicts_with = "client")]
-        server: bool,
     },
     #[command(
-        about = "Add mods, data packs, or other packages to an existing instance",
+        about = "Add mods, data packs, or other packages to an existing server",
         alias = "a"
     )]
     Add {
@@ -30,10 +26,10 @@ pub enum Commands {
         path: Option<OsString>,
         package: OsString,
     },
-    #[command(about = "Remove packages from an existing instance", alias = "r")]
+    #[command(about = "Remove packages from an existing server", alias = "r")]
     Remove { package: OsString },
-    #[command(about = "Start an instance")]
+    #[command(about = "Start a server")]
     Start { path: Option<OsString> },
-    #[command(about = "Stop an instance")]
+    #[command(about = "Stop a server")]
     Stop { path: Option<OsString> },
 }

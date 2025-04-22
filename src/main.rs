@@ -1,7 +1,7 @@
 mod commands;
 mod fabric;
 mod github;
-mod instance;
+mod server;
 mod java;
 mod mc;
 mod modrinth;
@@ -31,7 +31,7 @@ struct Cli {
 async fn main() -> Result<()> {
     let args = Cli::parse();
     match args.command {
-        Commands::New { client, server } => new(client, server).await,
+        Commands::New { } => new().await,
         Commands::Add { path, package } => add(package),
         Commands::Remove { package } => remove(package),
         Commands::Start { path } => start(path),

@@ -1,6 +1,6 @@
 use crate::fabric;
 use crate::github;
-use crate::instance::{Instance, InstanceType, get_instance_count};
+use crate::server::{Server, get_server_count};
 use crate::java;
 use crate::mc;
 use crate::modrinth;
@@ -11,46 +11,24 @@ use console::{Term, style};
 use dialoguer::{Input, Select, theme::ColorfulTheme};
 use number_names::ordinal;
 
-pub async fn new(client: bool, mut server: bool) -> Result<()> {
+pub async fn new() -> Result<()> {
     let term = Term::stdout();
 
-    let title = style("New instance").bold().green();
+    let title = style("New server").bold().green();
 
     term.write_line("")?;
     term.write_line(&title.to_string())?;
     term.write_line("")?;
 
-    if client == false && server == false {
-        let type_input = Select::with_theme(&ColorfulTheme::default())
-            .with_prompt("Instance type")
-            .items(&["Client", "Server"])
-            .default(0)
-            .interact()?;
-
-        if type_input == 1 {
-            server = true;
-        }
-    }
-
-    let r#type: InstanceType = if server == true {
-        InstanceType::Server
-    } else {
-        InstanceType::Client
-    };
-
-    let instance_number: String = match r#type {
-        InstanceType::Server => ordinal((get_instance_count(InstanceType::Server)?) + 1),
-        InstanceType::Client => ordinal((get_instance_count(InstanceType::Client)?) + 1),
-    };
+    let server_number: String = ordinal((get_server_count()?) + 1);
 
     let default_name = format!(
-        "My {} {} Instance",
-        instance_number.to_string().capitalize(),
-        r#type
+        "My {} Server",
+        server_number.to_string().capitalize()
     );
 
     let name: String = Input::with_theme(&ColorfulTheme::default())
-        .with_prompt("Instance name")
+        .with_prompt("Server name")
         .default(default_name.into())
         .interact_text()?;
 
@@ -120,15 +98,14 @@ pub async fn new(client: bool, mut server: bool) -> Result<()> {
 
     let fabric_version = &fabric_versions[fabric_version_input];
 
-    let instance = Instance::new(
+    let server = Server::new(
         name.clone(),
-        r#type,
         version.clone(),
         fabric_version.clone(),
         java_version.clone(),
     );
 
-    let build = tokio::spawn(async move { instance.build().await });
+    let build = tokio::spawn(async move { server.build().await });
 
     build.await;
 
