@@ -1,7 +1,3 @@
-use crate::fabric;
-use crate::java;
-use crate::mc;
-
 use anyhow::{Context, Result};
 use indicatif::ProgressBar;
 use serde::Serialize;
@@ -12,30 +8,29 @@ use std::fs;
 #[derive(Debug, Serialize)]
 pub struct Server {
     name: String,
-    #[serde_as(as = "DisplayFromStr")]
-    version: mc::Version,
-    #[serde_as(as = "DisplayFromStr")]
-    fabric_version: fabric::Version,
-    #[serde_as(as = "DisplayFromStr")]
-    java_version: java::Version,
+    version: String,
+    fabric: String,
+    #[serde(skip)]
+    installer: String,
+    java: String,
 }
 
 impl Server {
     pub fn new(
         name: String,
-        version: mc::Version,
-        fabric_version: fabric::Version,
-        java_version: java::Version,
+        version: String,
+        fabric: String,
+        java: String,
     ) -> Self {
         Self {
             name,
             version,
-            fabric_version,
-            java_version,
+            fabric,
+            java,
         }
     }
 
-    pub async fn build(&self) -> Result<()> {
+    pub async fn build(&self, http: &reqwest::Client) -> Result<()> {
         let config_dir = dirs::config_dir().expect("Failed to get config directory");
         let pickaxe_dir = config_dir.join("pickaxe");
         let output_dir = pickaxe_dir
@@ -50,17 +45,35 @@ impl Server {
 
         let java_dir = pickaxe_dir
             .join("java")
-            .join(&self.java_version.to_string());
+            .join(&self.java.to_string());
         fs::create_dir_all(&java_dir)?;
-        java::download(java_dir, &self.java_version).await?;
+
+        //java::download(java_dir, &self.java).await?;
 
         let fabric_dir = pickaxe_dir
             .join("fabric")
-            .join(&self.fabric_version.to_string());
+            .join(&self.fabric.to_string());
         fs::create_dir_all(fabric_dir)?;
-        //fabric::download(&fabric_dir, &self.fabric_version)?;
+
+        self::download(self.version, self.fabric, self.installer, fabric_dir, http).await?;
 
         Ok(())
+    }
+
+    fn download(
+        version: String,
+        fabric: String,
+        installer: String,
+        output_dir: std::path::PathBuf,
+        http: &reqwest::Client,
+    ) -> Result<()> {
+        let url = format!("{}/v2/versions/loader/{}/{}/{}/server/jar", META_API_URL, version, fabric, installer);
+        let response = http.get(url)
+            .send()
+        let pb: ProgressBar = ProgressBar::new_spinner();
+        pb.set_style(indicatif::ProgressStyle::default_spinner());
+        pb.enable_steady_tick(std::time::Duration::from_millis(100));
+        pb.set_message("Downloading Fabric Loader...");
     }
 
     pub fn to_toml(&self) -> Result<String> {

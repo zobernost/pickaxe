@@ -1,10 +1,7 @@
 mod commands;
 mod fabric;
 mod github;
-mod server;
 mod java;
-mod mc;
-mod modrinth;
 
 use commands::Commands;
 use commands::add::add;

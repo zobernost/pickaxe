@@ -1,11 +1,14 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
+pub mod maven;
+pub mod meta;
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Version {
+    #[serde(rename = "tag_name")]
     pub version: String,
-    pub version_type: String,
-    pub major: bool,
+    pub prerelease: bool,
 }
 
 impl fmt::Display for Version {
@@ -18,8 +21,10 @@ impl Clone for Version {
     fn clone(&self) -> Self {
         Version {
             version: self.version.clone(),
-            version_type: self.version_type.clone(),
-            major: self.major,
+            prerelease: self.prerelease,
         }
     }
 }
+
+//https://meta.fabricmc.net/v2/versions/loader/1.21.5/0.16.14
+//https://maven.fabricmc.net/net/fabricmc/fabric-loader/0.16.4/

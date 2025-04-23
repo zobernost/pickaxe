@@ -1,5 +1,4 @@
 use crate::github;
-use crate::mc;
 
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
@@ -9,7 +8,7 @@ use std::path::PathBuf;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Version {
     pub version: usize,
-    pub threshold: mc::Version,
+    pub threshold: String,
 }
 
 impl fmt::Display for Version {
@@ -31,19 +30,11 @@ pub fn supported_java_versions() -> [Version; 2] {
     return [
         Version {
             version: 21,
-            threshold: mc::Version {
-                version: "1.20.5".to_string(),
-                version_type: "release".to_string(),
-                major: false,
-            },
+            threshold: "1.20.5".to_string()
         },
         Version {
             version: 17,
-            threshold: mc::Version {
-                version: "1.17.0".to_string(),
-                version_type: "release".to_string(),
-                major: true,
-            },
+            threshold: "1.17.0".to_string(),
         },
     ];
 }
